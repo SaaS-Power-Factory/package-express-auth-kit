@@ -1,6 +1,6 @@
 # express-auth-kit
 
-[![npm version](https://badge.fury.io/js/@saas-power-factory%2Fexpress-auth-kit.svg)](https://www.npmjs.com/package/@saas-power-factory/express-auth-kit)
+[![npm version](https://img.shields.io/npm/v/@saas-power-factory/express-auth-kit.svg)](https://www.npmjs.com/package/@saas-power-factory/express-auth-kit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 🔐 Lightweight toolkit to add JWT-based authentication and route guards to Express APIs.
