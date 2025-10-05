@@ -1,0 +1,27 @@
+### Test the auth package with these requests
+### (Use REST Client extension in VS Code)
+
+@baseUrl = http://localhost:3000
+
+### 1. Login to get a token
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "testuser"
+}
+
+### 2. Access protected route (replace YOUR_TOKEN with token from step 1)
+GET {{baseUrl}}/protected
+Authorization: Bearer YOUR_TOKEN
+
+### 3. Get profile (replace YOUR_TOKEN with token from step 1)
+GET {{baseUrl}}/profile
+Authorization: Bearer YOUR_TOKEN
+
+### 4. Test without token (should fail)
+GET {{baseUrl}}/protected
+
+### 5. Test with invalid token (should fail)
+GET {{baseUrl}}/protected
+Authorization: Bearer invalid.token.here
