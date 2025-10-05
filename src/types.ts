@@ -20,6 +20,60 @@ export interface AuthConfig {
    * @default 'HS256'
    */
   algorithm?: 'HS256' | 'HS384' | 'HS512';
+
+  /**
+   * Token issuer (who created and signed this token)
+   * @example 'my-app.com'
+   */
+  issuer?: string;
+
+  /**
+   * Token audience (who or what the token is intended for)
+   * @example 'api.my-app.com'
+   */
+  audience?: string;
+
+  /**
+   * Custom error messages for authentication failures
+   */
+  errorMessages?: {
+    noToken?: string;
+    invalidToken?: string;
+    expiredToken?: string;
+    noAuthHeader?: string;
+    invalidFormat?: string;
+  };
+
+  /**
+   * Custom header name for the authorization token
+   * @default 'authorization'
+   */
+  headerName?: string;
+
+  /**
+   * Custom token prefix (e.g., 'Bearer', 'JWT', 'Token')
+   * @default 'Bearer'
+   */
+  tokenPrefix?: string;
+
+  /**
+   * Allow tokens from query string (e.g., ?token=xyz)
+   * Useful for WebSocket connections or download links
+   * @default false
+   */
+  allowQueryToken?: boolean;
+
+  /**
+   * Query parameter name when allowQueryToken is true
+   * @default 'token'
+   */
+  queryTokenName?: string;
+
+  /**
+   * Custom function to extract user info from decoded token
+   * Useful for adding role checks, permission checks, etc.
+   */
+  onTokenDecoded?: (payload: JwtPayload) => Promise<JwtPayload | null> | JwtPayload | null;
 }
 
 /**

@@ -23,7 +23,7 @@ describe('protect middleware', () => {
 
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({
-      error: 'No authorization header provided',
+      error: 'No authorization token provided',
     });
     expect(next).not.toHaveBeenCalled();
   });
