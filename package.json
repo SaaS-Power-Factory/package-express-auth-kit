@@ -18,6 +18,18 @@
     "prepare": "npm run build",
     "example": "node --import tsx example/server.ts"
   },
+  "keywords": [
+    "express",
+    "jwt",
+    "authentication",
+    "auth",
+    "middleware",
+    "express-middleware",
+    "jwt-auth",
+    "authorization",
+    "security",
+    "token"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",

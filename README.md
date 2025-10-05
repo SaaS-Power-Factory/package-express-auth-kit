@@ -52,17 +52,111 @@ app.listen(3000);
 
 Initializes the auth kit with configuration and returns utilities.
 
-**Config:**
-- `jwtSecret` (string, required): Secret key for JWT signing
+**Basic Config:**
+- `jwtSecret` (string, required): Secret key for JWT signing (min 32 chars recommended)
 - `expiresIn` (string, optional): Token expiration (default: '7d')
 - `algorithm` (string, optional): JWT algorithm (default: 'HS256')
+
+**Advanced Config:**
+- `issuer` (string, optional): Token issuer identifier
+- `audience` (string, optional): Token audience identifier
+- `headerName` (string, optional): Custom auth header name (default: 'authorization')
+- `tokenPrefix` (string, optional): Custom token prefix (default: 'Bearer')
+- `allowQueryToken` (boolean, optional): Allow tokens in query string (default: false)
+- `queryTokenName` (string, optional): Query param name for token (default: 'token')
+- `errorMessages` (object, optional): Custom error messages
+  - `noToken`: Message when no token provided
+  - `invalidToken`: Message for invalid tokens
+  - `expiredToken`: Message for expired tokens
+  - `noAuthHeader`: Message when header missing
+  - `invalidFormat`: Message for wrong token format
+- `onTokenDecoded` (function, optional): Hook to modify/validate decoded token
 
 **Returns:**
 - `signToken(payload)`: Signs a JWT token
 - `verifyToken(token)`: Verifies and decodes a token
 - `protect`: Express middleware for route protection
 
-### Request Authentication
+## Advanced Examples
+
+### With Issuer & Audience
+
+```typescript
+const auth = initAuth({
+  jwtSecret: process.env.JWT_SECRET!,
+  issuer: 'my-app.com',
+  audience: 'api.my-app.com',
+});
+```
+
+### Custom Error Messages
+
+```typescript
+const auth = initAuth({
+  jwtSecret: process.env.JWT_SECRET!,
+  errorMessages: {
+    noToken: 'Authentication required',
+    invalidToken: 'Invalid credentials',
+    expiredToken: 'Session expired, please login again',
+  },
+});
+```
+
+### Custom Header & Prefix
+
+```typescript
+const auth = initAuth({
+  jwtSecret: process.env.JWT_SECRET!,
+  headerName: 'x-auth-token',
+  tokenPrefix: 'JWT',
+});
+
+// Client sends: x-auth-token: JWT <token>
+```
+
+### Query Token Support (WebSocket/Downloads)
+
+```typescript
+const auth = initAuth({
+  jwtSecret: process.env.JWT_SECRET!,
+  allowQueryToken: true,
+  queryTokenName: 'access_token',
+});
+
+// Now works with: GET /download?access_token=<token>
+```
+
+### Token Validation Hook
+
+```typescript
+const auth = initAuth({
+  jwtSecret: process.env.JWT_SECRET!,
+  onTokenDecoded: async (payload) => {
+    // Fetch user from database
+    const user = await db.users.findById(payload.sub);
+    
+    if (!user || user.banned) {
+      return null; // Reject authentication
+    }
+    
+    // Add additional data to request
+    return {
+      ...payload,
+      role: user.role,
+      permissions: user.permissions,
+    };
+  },
+});
+
+app.get('/admin', auth.protect, (req, res) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  res.json({ message: 'Admin access granted' });
+});
+```
+
+## Request Authentication
 
 Protected routes receive the decoded JWT payload in `req.user`:
 
@@ -73,12 +167,17 @@ app.get('/me', auth.protect, (req: AuthRequest, res) => {
 });
 ```
 
-### Token Format
+## Token Format
 
-Clients must send tokens in the `Authorization` header:
+Clients must send tokens in the `Authorization` header (or query string if enabled):
 
 ```
 Authorization: Bearer <your-jwt-token>
+```
+
+Or with query token:
+```
+GET /api/download?token=<your-jwt-token>
 ```
 
 ## TypeScript

@@ -8,12 +8,31 @@ export function signToken(
   payload: Omit<JwtPayload, 'iat' | 'exp'>,
   config: AuthConfig
 ): string {
-  const { jwtSecret, expiresIn = '7d', algorithm = 'HS256' } = config;
+  const { 
+    jwtSecret, 
+    expiresIn = '7d', 
+    algorithm = 'HS256',
+    issuer,
+    audience 
+  } = config;
 
-  return jwt.sign(payload, jwtSecret, {
-    expiresIn,
+  const options: any = {
     algorithm,
-  } as jwt.SignOptions);
+  };
+
+  if (expiresIn) {
+    options.expiresIn = expiresIn;
+  }
+
+  if (issuer) {
+    options.issuer = issuer;
+  }
+
+  if (audience) {
+    options.audience = audience;
+  }
+
+  return jwt.sign(payload, jwtSecret, options);
 }
 
 /**
@@ -21,20 +40,36 @@ export function signToken(
  * @throws {Error} If token is invalid or expired
  */
 export function verifyToken(token: string, config: AuthConfig): JwtPayload {
-  const { jwtSecret, algorithm = 'HS256' } = config;
+  const { 
+    jwtSecret, 
+    algorithm = 'HS256',
+    issuer,
+    audience,
+    errorMessages = {}
+  } = config;
 
   try {
-    const decoded = jwt.verify(token, jwtSecret, {
+    const options: any = {
       algorithms: [algorithm],
-    }) as JwtPayload;
+    };
 
-    return decoded;
+    if (issuer) {
+      options.issuer = issuer;
+    }
+
+    if (audience) {
+      options.audience = audience;
+    }
+
+    const decoded = jwt.verify(token, jwtSecret, options);
+
+    return decoded as unknown as JwtPayload;
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      throw new Error('Invalid token');
+      throw new Error(errorMessages.invalidToken || 'Invalid token');
     }
     if (error instanceof jwt.TokenExpiredError) {
-      throw new Error('Token expired');
+      throw new Error(errorMessages.expiredToken || 'Token expired');
     }
     throw error;
   }
