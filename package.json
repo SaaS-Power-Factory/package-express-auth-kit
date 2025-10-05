@@ -1,6 +1,6 @@
 {
   "name": "@saas-power-factory/express-auth-kit",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Lightweight toolkit to add JWT-based auth and route guards to Express APIs",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
